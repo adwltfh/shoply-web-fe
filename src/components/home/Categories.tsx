@@ -6,6 +6,7 @@ import { icons } from "lucide-react";
 import { Category } from "@/types/product";
 import { categoryApi } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 const CATEGORY_ICON_MAP: Record<string, keyof typeof icons> = {
   Beauty: "Sparkles",
@@ -122,8 +123,8 @@ export default function Categories() {
 
   const categories = useMemo(
     () => [...rawCategories].sort((a, b) => a.name.localeCompare(b.name)),
-    [rawCategories]
-  );  
+    [rawCategories],
+  );
 
   useEffect(() => {
     function calculate() {
@@ -208,7 +209,9 @@ export default function Categories() {
                     }
                   />
                 ))}
-                <MoreButton onClick={() => router.push("/categories")} />
+                <Link href="/categories">
+                  <MoreButton onClick={() => {}} />
+                </Link>
               </div>
             )}
           </div>
@@ -245,7 +248,9 @@ export default function Categories() {
                 }
               />
             ))}
-            <MoreButton onClick={() => router.push("/categories")} />
+            <Link href="/categories">
+              <MoreButton onClick={() => {}} />
+            </Link>
           </div>
         </div>
       )}
