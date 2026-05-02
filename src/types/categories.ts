@@ -39,4 +39,24 @@ export const categories = [
       name: "Networking",
       icon: "Wifi",
     },
+    {
+      name: "Printers",
+      icon: "Printer",
+    },
+    {
+      name: "Storage",
+      icon: "HardDrive",
+    },
+    {
+      name: "Monitors",
+      icon: "Monitor",
+    },
+    {
+      name: "Keyboards",
+      icon: "Keyboard",
+    },
+    {
+      name: "Drones",
+      icon: "PlaneTakeoff",
+    },
   ];
