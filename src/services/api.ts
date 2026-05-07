@@ -2,7 +2,17 @@ import api from "@/lib/axios";
 import { Category, Product } from "@/types/product";
 
 export const productApi = {
-  getAll: async (
+  getAll: async (): Promise<Product[]> => {
+    const { data } = await api.get<{
+      products: Product[];
+      total: number;
+      skip: number;
+      limit: number;
+    }>("/products");
+    return data.products;
+  },
+
+  getProducts: async (
     skip = 0,
     limit = 10,
   ): Promise<{

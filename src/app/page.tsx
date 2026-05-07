@@ -5,7 +5,8 @@ import { categoryApi, productApi } from "@/services/api";
 import Hero from "@/components/home/Hero";
 import Categories from "@/components/home/Categories";
 import TopCategories from "@/components/home/TopCategories";
-import { Category } from "@/types/product";
+import { Category, Product } from "@/types/product";
+import BestSellers from "@/components/home/BestSellers";
 
 export default function Home() {
   const {
@@ -28,8 +29,19 @@ export default function Home() {
     gcTime: 60 * 60 * 1000,
   });
 
-  const isLoading = categoriesLoading || countsLoading;
-  const isError = categoriesError || countsError;
+  const {
+    data: products = [],
+    isLoading: productsLoading,
+    isError: productsError,
+  } = useQuery<Product[]>({
+    queryKey: ["products"],
+    queryFn: productApi.getAll,
+    staleTime: 60 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  });
+
+  const isLoading = categoriesLoading || countsLoading || productsLoading;
+  const isError = categoriesError || countsError || productsError;
 
   return (
     <main className="min-h-screen mx-auto">
@@ -48,6 +60,11 @@ export default function Home() {
           <TopCategories
             categories={categories}
             categoryCounts={categoryCounts}
+            isLoading={isLoading}
+          />
+          <hr className="my-8 border-gray-300" />
+          <BestSellers
+            products={products}
             isLoading={isLoading}
           />
         </>
