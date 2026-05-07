@@ -10,7 +10,7 @@ export interface Product {
   slug: string;
   price: number;
   description: string;
-  category: Category;
+  category: string;
   images: string[];
   creationAt: string;
   updatedAt: string;

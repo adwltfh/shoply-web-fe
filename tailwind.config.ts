@@ -10,6 +10,7 @@ const config: Config = {
         background: "#FFF7ED",
         textPrimary: "#1F2937",
         textSecondary: "#6B7280",
+        beigeBackground: "#FEF3E2",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"],

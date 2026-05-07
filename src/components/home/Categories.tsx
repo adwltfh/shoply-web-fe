@@ -4,9 +4,6 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { icons } from "lucide-react";
 import { Category } from "@/types/product";
-import { categoryApi } from "@/services/api";
-import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 
 const CATEGORY_ICON_MAP: Record<string, keyof typeof icons> = {
   Beauty: "Sparkles",
@@ -59,18 +56,17 @@ function CategoryItem({
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-2 group w-20 focus:outline-none"
+      className="flex flex-col items-center gap-2 group w-16 focus:outline-none"
     >
       <div
-        className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200 bg-background
-          ${
-            active
-              ? "shadow-md shadow-orange-200"
-              : "group-hover:bg-orange-50 group-hover:shadow-sm"
-          }`}
+        className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
+          active
+            ? "bg-orange-100 ring-2 ring-orange-300"
+            : "bg-gray-100 group-hover:bg-orange-50"
+        }`}
       >
         <IconComponent
-          className={`w-6 h-6 transition-colors duration-200 ${
+          className={`w-5 h-5 transition-colors duration-200 ${
             active
               ? "text-orange-500"
               : "text-gray-500 group-hover:text-orange-400"
@@ -78,8 +74,8 @@ function CategoryItem({
         />
       </div>
       <span
-        className={`text-xs font-medium transition-colors duration-200 text-center leading-tight break-words ${
-          active ? "text-orange-500" : "text-gray-500 group-hover:text-gray-700"
+        className={`text-xs transition-colors duration-200 text-center leading-tight ${
+          active ? "text-orange-500 font-medium" : "text-gray-500"
         }`}
       >
         {name}
@@ -92,21 +88,27 @@ function MoreButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-2 group w-20 focus:outline-none"
+      className="flex flex-col items-center gap-2 group w-16 focus:outline-none"
     >
-      <div className="w-14 h-14 rounded-2xl bg-background flex items-center justify-center group-hover:bg-orange-50 transition-all duration-200">
-        <span className="text-lg font-bold text-gray-400 group-hover:text-orange-400 leading-none">
+      <div className="w-16 h-16 rounded-full bg-gray-100 ring-2 ring-orange-400 flex items-center justify-center group-hover:bg-orange-50 transition-all duration-200">
+        <span className="text-sm font-bold text-orange-400 leading-none tracking-widest">
           •••
         </span>
       </div>
-      <span className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-        More
-      </span>
+      <span className="text-xs text-orange-400 font-medium">More</span>
     </button>
   );
 }
 
-export default function Categories() {
+interface CategoriesProps {
+  categories: Category[];
+  isLoading: boolean;
+}
+
+export default function Categories({
+  categories: rawCategories,
+  isLoading,
+}: CategoriesProps) {
   const router = useRouter();
   const [active, setActive] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(true);
@@ -116,13 +118,11 @@ export default function Categories() {
   const isScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { data: rawCategories = [] } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: categoryApi.getAll,
-  });
-
   const categories = useMemo(
-    () => [...rawCategories].sort((a, b) => a.name.localeCompare(b.name)),
+    () =>
+      [...rawCategories]
+        .filter((c) => !c.name.includes(" "))
+        .sort((a, b) => a.name.localeCompare(b.name)),
     [rawCategories],
   );
 
@@ -168,7 +168,19 @@ export default function Categories() {
 
   return (
     <section className="mt-8" ref={containerRef}>
-      {isMobile ? (
+      <p className="text-sm font-medium text-gray-500 mb-4">
+        Browse categories
+      </p>
+      {isLoading ? (
+        <div className="flex justify-between px-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 w-16">
+              <div className="w-16 h-16 rounded-full bg-gray-100 animate-pulse" />
+              <div className="h-2.5 w-10 rounded bg-gray-100 animate-pulse" />
+            </div>
+          ))}
+        </div>
+      ) : isMobile ? (
         /* ── Mobile: paginated carousel ── */
         <div>
           <div
@@ -209,9 +221,7 @@ export default function Categories() {
                     }
                   />
                 ))}
-                <Link href="/categories">
-                  <MoreButton onClick={() => {}} />
-                </Link>
+                <MoreButton onClick={() => router.push("/categories")} />
               </div>
             )}
           </div>
@@ -248,9 +258,7 @@ export default function Categories() {
                 }
               />
             ))}
-            <Link href="/categories">
-              <MoreButton onClick={() => {}} />
-            </Link>
+            <MoreButton onClick={() => router.push("/categories")} />
           </div>
         </div>
       )}
