@@ -7,6 +7,9 @@ import Categories from "@/components/home/Categories";
 import TopCategories from "@/components/home/TopCategories";
 import { Category, Product } from "@/types/product";
 import BestSellers from "@/components/home/BestSellers";
+import FlashSale from "@/components/home/FlashSale";
+import NewArrivals from "@/components/home/NewArrivals";
+import FeaturedBrands from "@/components/home/FeaturedBrands";
 
 export default function Home() {
   const {
@@ -63,10 +66,13 @@ export default function Home() {
             isLoading={isLoading}
           />
           <hr className="my-8 border-gray-300" />
-          <BestSellers
-            products={products}
-            isLoading={isLoading}
-          />
+          <BestSellers products={products} isLoading={isLoading} />
+          <hr className="my-8 border-gray-300" />
+          <FlashSale products={products} isLoading={isLoading} />
+          <hr className="my-8 border-gray-300" />
+          <NewArrivals products={products} isLoading={isLoading} />
+          <hr className="my-8 border-gray-300" />
+          <FeaturedBrands products={products} isLoading={isLoading} />
         </>
       )}
     </main>
