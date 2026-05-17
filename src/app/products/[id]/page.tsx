@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { productApi } from "@/services/api";
 import { useCartStore } from "@/store/useCartStore";
+import { useAuthStore } from "@/store/authStore";
+import { useWishlistStore } from "@/store/useWishlistStore";
 import ProductCard from "@/components/ProductCard";
 
 type Tab = "description" | "specifications" | "reviews";
@@ -25,11 +27,12 @@ export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const addToCart = useCartStore((state: any) => state.addToCart);
+  const { isAuthenticated } = useAuthStore();
+  const { isWishlisted, toggleItem } = useWishlistStore();
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<Tab>("description");
-  const [wishlisted, setWishlisted] = useState(false);
   const [bottomSheet, setBottomSheet] = useState<"cart" | "buy" | null>(null);
   const [modalQty, setModalQty] = useState(1);
 
@@ -81,6 +84,23 @@ export default function ProductDetailPage() {
       ? product.price / (1 - product.discountPercentage / 100)
       : null;
 
+  const wishlisted = isWishlisted(product.id);
+
+  const handleWishlistToggle = () => {
+    if (!isAuthenticated) {
+      router.push(`/login?callback=/products/${id}`);
+      return;
+    }
+    toggleItem({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      thumbnail: product.thumbnail,
+      discountPercentage: product.discountPercentage,
+      rating: product.rating,
+    });
+  };
+
   const handleAddToCart = (qty: number) => {
     addToCart({
       id: product!.id,
@@ -103,7 +123,7 @@ export default function ProductDetailPage() {
           Back to Home
         </button>
         <button
-          onClick={() => setWishlisted((w) => !w)}
+          onClick={handleWishlistToggle}
           className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors ${
             wishlisted
               ? "border-orange-400 text-orange-500"

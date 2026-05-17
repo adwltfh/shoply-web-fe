@@ -164,3 +164,28 @@ export const categoryApi = {
     return data.total;
   },
 };
+
+export interface AuthUserResponse {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  image: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export const authApi = {
+  login: async (
+    username: string,
+    password: string,
+  ): Promise<AuthUserResponse> => {
+    const { data } = await api.post<AuthUserResponse>("/auth/login", {
+      username,
+      password,
+      expiresInMins: 60,
+    });
+    return data;
+  },
+};

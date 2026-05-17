@@ -1,24 +1,34 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
-interface User {
-  id: string;
-  name: string;
+export interface AuthUser {
+  id: number;
+  username: string;
   email: string;
+  firstName: string;
+  lastName: string;
+  image: string;
 }
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
-  setUser: (user: User) => void;
+  setAuth: (user: AuthUser, accessToken: string) => void;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
-  devtools((set) => ({
-    user: null,
-    isAuthenticated: false,
-    setUser: (user) => set({ user, isAuthenticated: true }),
-    logout: () => set({ user: null, isAuthenticated: false }),
-  }))
+  persist(
+    (set) => ({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+      setAuth: (user, accessToken) =>
+        set({ user, accessToken, isAuthenticated: true }),
+      logout: () =>
+        set({ user: null, accessToken: null, isAuthenticated: false }),
+    }),
+    { name: "shoply-auth" },
+  ),
 );
