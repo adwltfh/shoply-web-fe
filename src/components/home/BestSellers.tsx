@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import Image from "next/image";
+import ProductImage from "@/components/ProductImage";
 import Link from "next/link";
 import { Product } from "@/types/product";
 
@@ -12,10 +12,7 @@ interface BestSellersProps {
   isLoading: boolean;
 }
 
-export default function BestSellers({
-  products,
-  isLoading,
-}: BestSellersProps) {
+export default function BestSellers({ products, isLoading }: BestSellersProps) {
   const bestSellers = useMemo(() => {
     if (products.length === 0) return [];
     return [...products]
@@ -62,7 +59,7 @@ export default function BestSellers({
                       {product.rating.toFixed(1)}
                     </span>
                   </div>
-                  <Image
+                  <ProductImage
                     src={product.thumbnail}
                     alt={product.title}
                     fill

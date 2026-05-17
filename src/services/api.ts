@@ -63,6 +63,44 @@ export const productApi = {
     );
     return data;
   },
+
+  search: async (
+    q: string,
+    skip = 0,
+    limit = 12,
+  ): Promise<{
+    products: Product[];
+    total: number;
+    skip: number;
+    limit: number;
+  }> => {
+    const { data } = await api.get<{
+      products: Product[];
+      total: number;
+      skip: number;
+      limit: number;
+    }>("/products/search", { params: { q, skip, limit } });
+    return data;
+  },
+
+  getByCategorySlug: async (
+    slug: string,
+    skip = 0,
+    limit = 12,
+  ): Promise<{
+    products: Product[];
+    total: number;
+    skip: number;
+    limit: number;
+  }> => {
+    const { data } = await api.get<{
+      products: Product[];
+      total: number;
+      skip: number;
+      limit: number;
+    }>(`/products/category/${slug}`, { params: { skip, limit } });
+    return data;
+  },
 };
 
 export const categoryApi = {

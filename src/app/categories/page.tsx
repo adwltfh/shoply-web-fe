@@ -141,7 +141,7 @@ export default async function CategoriesPage() {
                 return (
                   <Link
                     key={category.slug}
-                    href={`/products?category=${category.slug}`}
+                    href={`/categories/${category.slug}`}
                     className="group flex items-center gap-3 px-4 py-3.5 rounded-xl border border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50 transition-all duration-150"
                   >
                     <ItemIcon
@@ -168,7 +168,7 @@ export default async function CategoriesPage() {
             {otherCategories.map((category) => (
               <Link
                 key={category.slug}
-                href={`/products?category=${category.slug}`}
+                href={`/categories/${category.slug}`}
                 className="group flex items-center gap-3 px-4 py-3.5 rounded-xl border border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50 transition-all duration-150"
               >
                 <Tag

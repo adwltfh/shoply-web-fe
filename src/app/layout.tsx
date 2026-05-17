@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ReactQueryProvider } from "@/lib/react-query";
 import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({
         <ReactQueryProvider>
           <Navbar />
           <div className="max-w-5xl mx-auto px-4">{children}</div>
+          <Footer />
         </ReactQueryProvider>
       </body>
     </html>

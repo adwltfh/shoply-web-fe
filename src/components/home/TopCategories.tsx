@@ -37,8 +37,7 @@ export default function TopCategories({
     if (categories.length === 0) return [];
     return [...categories]
       .sort(
-        (a, b) =>
-          (categoryCounts[b.slug] ?? 0) - (categoryCounts[a.slug] ?? 0),
+        (a, b) => (categoryCounts[b.slug] ?? 0) - (categoryCounts[a.slug] ?? 0),
       )
       .slice(0, TOP_LIMIT);
   }, [categories, categoryCounts]);
@@ -66,7 +65,7 @@ export default function TopCategories({
           : topCategories.map((cat, i) => (
               <Link
                 key={cat.slug}
-                href={`/products?category=${cat.slug}`}
+                href={`/categories/${cat.slug}`}
                 className="group flex flex-col gap-2"
               >
                 <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray-100">

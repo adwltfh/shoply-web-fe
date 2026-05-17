@@ -66,9 +66,9 @@ export default function Home() {
             isLoading={isLoading}
           />
           <hr className="my-8 border-gray-300" />
-          <BestSellers products={products} isLoading={isLoading} />
-          <hr className="my-8 border-gray-300" />
           <FlashSale products={products} isLoading={isLoading} />
+          <hr className="my-8 border-gray-300" />
+          <BestSellers products={products} isLoading={isLoading} />
           <hr className="my-8 border-gray-300" />
           <NewArrivals products={products} isLoading={isLoading} />
           <hr className="my-8 border-gray-300" />

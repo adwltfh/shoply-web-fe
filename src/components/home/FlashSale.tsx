@@ -1,12 +1,45 @@
 "use client";
 
-import { useMemo } from "react";
-import Image from "next/image";
+import { useMemo, useState, useEffect } from "react";
+import ProductImage from "@/components/ProductImage";
 import Link from "next/link";
 import { Product } from "@/types/product";
 
 const TOP_LIMIT = 4;
 const MIN_DISCOUNT = 10;
+const WINDOW_MS = 8 * 60 * 60 * 1000; // 8 hours
+
+function useFlashSaleSlot() {
+  const getSlot = () => Math.floor(Date.now() / WINDOW_MS);
+  const getRemaining = () => (getSlot() + 1) * WINDOW_MS - Date.now();
+
+  const [mounted, setMounted] = useState(false);
+  const [slot, setSlot] = useState(0);
+  const [remaining, setRemaining] = useState(0);
+
+  useEffect(() => {
+    setMounted(true);
+    setSlot(getSlot());
+    setRemaining(getRemaining());
+    const tick = setInterval(() => {
+      const newSlot = getSlot();
+      setSlot((prev) => (prev !== newSlot ? newSlot : prev));
+      setRemaining(getRemaining());
+    }, 1000);
+    return () => clearInterval(tick);
+  }, []);
+
+  const totalSeconds = Math.floor(remaining / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return { mounted, slot, hours, minutes, seconds };
+}
+
+function pad(n: number) {
+  return String(n).padStart(2, "0");
+}
 
 interface FlashSaleProps {
   products: Product[];
@@ -14,22 +47,52 @@ interface FlashSaleProps {
 }
 
 export default function FlashSale({ products, isLoading }: FlashSaleProps) {
+  const { mounted, slot, hours, minutes, seconds } = useFlashSaleSlot();
+
   const saleItems = useMemo(() => {
     if (products.length === 0) return [];
-    return [...products]
+    // Stable base pool sorted by id so order is consistent across renders
+    const pool = [...products]
       .filter((p) => p.discountPercentage >= MIN_DISCOUNT)
-      .sort((a, b) => b.discountPercentage - a.discountPercentage)
-      .slice(0, TOP_LIMIT);
-  }, [products]);
+      .sort((a, b) => a.id - b.id);
+    if (pool.length === 0) return [];
+    // Deterministic offset from slot — same for all users in the same window
+    const offset = slot % pool.length;
+    const items: Product[] = [];
+    for (let i = 0; i < TOP_LIMIT && i < pool.length; i++) {
+      items.push(pool[(offset + i) % pool.length]);
+    }
+    return items;
+  }, [products, slot]);
 
   return (
     <section className="mt-8">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <p className="text-xl font-semibold text-gray-800">Flash Sale</p>
-          <span className="text-xs font-bold text-white bg-orange-500 rounded-full px-2 py-0.5">
-            HOT
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <p className="text-xl font-semibold text-gray-800">Flash Sale</p>
+            <span className="text-xs font-bold text-white bg-orange-500 rounded-full px-2 py-0.5">
+              HOT
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-400">Ends in</span>
+            <div className="flex items-center gap-1">
+              {(mounted
+                ? [pad(hours), pad(minutes), pad(seconds)]
+                : ["--", "--", "--"]
+              ).map((unit, i) => (
+                <span key={i} className="flex items-center gap-1">
+                  <span className="min-w-[28px] text-center text-xs font-black text-white bg-gray-800 rounded-md px-1.5 py-1 tabular-nums">
+                    {unit}
+                  </span>
+                  {i < 2 && (
+                    <span className="text-xs font-bold text-gray-400">:</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
         <Link
           href="/products"
@@ -63,7 +126,7 @@ export default function FlashSale({ products, isLoading }: FlashSaleProps) {
                         -{Math.round(product.discountPercentage)}%
                       </span>
                     </div>
-                    <Image
+                    <ProductImage
                       src={product.thumbnail}
                       alt={product.title}
                       fill

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import Image from "next/image";
+import ProductImage from "@/components/ProductImage";
 import Link from "next/link";
 import { Product } from "@/types/product";
 
@@ -62,7 +62,7 @@ export default function NewArrivals({ products, isLoading }: NewArrivalsProps) {
                       NEW
                     </span>
                   </div>
-                  <Image
+                  <ProductImage
                     src={product.thumbnail}
                     alt={product.title}
                     fill
