@@ -101,6 +101,48 @@ export const productApi = {
     }>(`/products/category/${slug}`, { params: { skip, limit } });
     return data;
   },
+
+  getByBrand: async (
+    brand: string,
+    skip = 0,
+    limit = 12,
+  ): Promise<{
+    products: Product[];
+    total: number;
+    skip: number;
+    limit: number;
+  }> => {
+    // DummyJSON has no brand endpoint — fetch all with minimal fields and filter in memory
+    const { data } = await api.get<{ products: Product[] }>("/products", {
+      params: {
+        limit: 0,
+        select: "id,title,price,thumbnail,brand,discountPercentage,rating",
+      },
+    });
+    const filtered = data.products.filter(
+      (p) => p.brand?.toLowerCase() === brand.toLowerCase(),
+    );
+    return {
+      products: filtered.slice(skip, skip + limit),
+      total: filtered.length,
+      skip,
+      limit,
+    };
+  },
+
+  getBrands: async (): Promise<{ name: string; count: number }[]> => {
+    const { data } = await api.get<{ products: { brand: string }[] }>(
+      "/products",
+      { params: { limit: 0, select: "brand" } },
+    );
+    const countMap: Record<string, number> = {};
+    for (const p of data.products) {
+      if (p.brand) countMap[p.brand] = (countMap[p.brand] ?? 0) + 1;
+    }
+    return Object.entries(countMap)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, count]) => ({ name, count }));
+  },
 };
 
 export const categoryApi = {

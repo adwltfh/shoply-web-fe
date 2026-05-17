@@ -110,7 +110,6 @@ export default function Categories({
   isLoading,
 }: CategoriesProps) {
   const router = useRouter();
-  const [active, setActive] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -199,10 +198,7 @@ export default function Categories({
                   key={category.name}
                   name={category.name}
                   icon={CATEGORY_ICON_MAP[category.name] || DEFAULT_ICON}
-                  active={active === category.name}
-                  onClick={() =>
-                    setActive(active === category.name ? null : category.name)
-                  }
+                  onClick={() => router.push(`/categories/${category.slug}`)}
                 />
               ))}
             </div>
@@ -215,10 +211,7 @@ export default function Categories({
                     key={category.name}
                     name={category.name}
                     icon={CATEGORY_ICON_MAP[category.name] || DEFAULT_ICON}
-                    active={active === category.name}
-                    onClick={() =>
-                      setActive(active === category.name ? null : category.name)
-                    }
+                    onClick={() => router.push(`/categories/${category.slug}`)}
                   />
                 ))}
                 <MoreButton onClick={() => router.push("/categories")} />
@@ -252,10 +245,7 @@ export default function Categories({
                 key={category.name}
                 name={category.name}
                 icon={CATEGORY_ICON_MAP[category.name] || DEFAULT_ICON}
-                active={active === category.name}
-                onClick={() =>
-                  setActive(active === category.name ? null : category.name)
-                }
+                onClick={() => router.push(`/categories/${category.slug}`)}
               />
             ))}
             <MoreButton onClick={() => router.push("/categories")} />

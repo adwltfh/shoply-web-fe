@@ -32,7 +32,7 @@ export default function FeaturedBrands({
       <div className="flex items-center justify-between mb-4">
         <p className="text-xl font-semibold text-gray-800">Featured Brands</p>
         <Link
-          href="/products"
+          href="/brands"
           className="text-sm text-gray-400 hover:text-orange-500 transition-colors"
         >
           See All
@@ -50,7 +50,7 @@ export default function FeaturedBrands({
           : brands.map(({ name, count }) => (
               <Link
                 key={name}
-                href={`/products?brand=${encodeURIComponent(name)}`}
+                href={`/brands/${encodeURIComponent(name)}`}
                 className="group flex flex-col items-center justify-center gap-1 h-14 rounded-2xl bg-gray-50 hover:bg-orange-50 border border-gray-100 hover:border-orange-200 transition-all duration-200 px-3"
               >
                 <span className="text-sm font-semibold text-gray-700 group-hover:text-orange-500 transition-colors truncate w-full text-center">
