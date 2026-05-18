@@ -16,9 +16,9 @@ import {
   Plus,
 } from "lucide-react";
 import { productApi } from "@/services/api";
-import { useCartStore } from "@/store/useCartStore";
+import { useCartStore, CartItem } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/authStore";
-import { useWishlistStore } from "@/store/useWishlistStore";
+import { useWishlistStore, WishlistItem } from "@/store/useWishlistStore";
 import ProductCard from "@/components/ProductCard";
 
 type Tab = "description" | "specifications" | "reviews";
@@ -26,9 +26,10 @@ type Tab = "description" | "specifications" | "reviews";
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const addToCart = useCartStore((state: any) => state.addToCart);
-  const { isAuthenticated } = useAuthStore();
-  const { isWishlisted, toggleItem } = useWishlistStore();
+  const addToCart = useCartStore((s) => s.addToCart);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const toggleItem = useWishlistStore((s) => s.toggleItem);
+  const wishlistItems = useWishlistStore((s) => s.items);
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -84,7 +85,7 @@ export default function ProductDetailPage() {
       ? product.price / (1 - product.discountPercentage / 100)
       : null;
 
-  const wishlisted = isWishlisted(product.id);
+  const wishlisted = wishlistItems.some((i) => i.id === product.id);
 
   const handleWishlistToggle = () => {
     if (!isAuthenticated) {
@@ -98,7 +99,7 @@ export default function ProductDetailPage() {
       thumbnail: product.thumbnail,
       discountPercentage: product.discountPercentage,
       rating: product.rating,
-    });
+    } satisfies WishlistItem);
   };
 
   const handleAddToCart = (qty: number) => {
@@ -108,7 +109,7 @@ export default function ProductDetailPage() {
       price: product!.price,
       thumbnail: product!.thumbnail,
       quantity: qty,
-    });
+    } satisfies CartItem);
   };
 
   return (

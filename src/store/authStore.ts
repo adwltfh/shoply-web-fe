@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
 
 export interface AuthUser {
   id: number;
@@ -19,16 +19,19 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      accessToken: null,
-      isAuthenticated: false,
-      setAuth: (user, accessToken) =>
-        set({ user, accessToken, isAuthenticated: true }),
-      logout: () =>
-        set({ user: null, accessToken: null, isAuthenticated: false }),
-    }),
-    { name: "shoply-auth" },
+  devtools(
+    persist(
+      (set) => ({
+        user: null,
+        accessToken: null,
+        isAuthenticated: false,
+        setAuth: (user, accessToken) =>
+          set({ user, accessToken, isAuthenticated: true }),
+        logout: () =>
+          set({ user: null, accessToken: null, isAuthenticated: false }),
+      }),
+      { name: "shoply-auth" },
+    ),
+    { name: "AuthStore" },
   ),
 );

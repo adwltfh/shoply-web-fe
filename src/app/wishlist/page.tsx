@@ -10,8 +10,9 @@ import ProductImage from "@/components/ProductImage";
 
 export default function WishlistPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
-  const { items, removeItem } = useWishlistStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const items = useWishlistStore((s) => s.items);
+  const removeItem = useWishlistStore((s) => s.removeItem);
   const addToCart = useCartStore((s) => s.addToCart);
 
   if (!isAuthenticated) {

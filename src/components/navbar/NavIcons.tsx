@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Heart, ShoppingCart, User, LogOut } from "lucide-react";
 import Image from "next/image";
+import { useShallow } from "zustand/react/shallow";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/authStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -15,9 +17,36 @@ export default function NavIcons() {
     s.cart.reduce((sum, item) => sum + item.quantity, 0),
   );
 
-  const { user, isAuthenticated, logout } = useAuthStore();
-  const { items: wishlistItems, clearWishlist } = useWishlistStore();
+  const { user, isAuthenticated, logout } = useAuthStore(
+    useShallow((s) => ({
+      user: s.user,
+      isAuthenticated: s.isAuthenticated,
+      logout: s.logout,
+    })),
+  );
+
+  const {
+    items: wishlistItems,
+    clearWishlist,
+    userId: wishlistUserId,
+    setUser,
+  } = useWishlistStore(
+    useShallow((s) => ({
+      items: s.items,
+      clearWishlist: s.clearWishlist,
+      userId: s.userId,
+      setUser: s.setUser,
+    })),
+  );
+
   const wishlistCount = wishlistItems.length;
+
+  // Re-hydrate wishlist after page reload when auth is already persisted
+  useEffect(() => {
+    if (user?.id && user.id !== wishlistUserId) {
+      setUser(user.id);
+    }
+  }, [user?.id, wishlistUserId, setUser]);
 
   const handleLogout = () => {
     logout();

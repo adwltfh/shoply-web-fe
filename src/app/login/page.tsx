@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { authApi } from "@/services/api";
@@ -9,13 +9,13 @@ import { useWishlistStore } from "@/store/useWishlistStore";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callback = searchParams.get("callback") ?? "/";
 
   const setAuth = useAuthStore((s) => s.setAuth);
-  const loadForUser = useWishlistStore((s) => s.loadForUser);
+  const setUser = useWishlistStore((s) => s.setUser);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -44,7 +44,7 @@ export default function LoginPage() {
         },
         res.accessToken,
       );
-      loadForUser(res.id);
+      setUser(res.id);
       router.push(callback);
     } catch {
       setError("Invalid username or password. Please try again.");
@@ -155,5 +155,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

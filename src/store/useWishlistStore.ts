@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, devtools } from "zustand/middleware";
 
 export interface WishlistItem {
   id: number;
@@ -10,65 +11,67 @@ export interface WishlistItem {
 }
 
 interface WishlistState {
+  /** Persisted: wishlist items keyed by userId */
+  itemsByUser: Record<number, WishlistItem[]>;
+  /** In-memory: items for the currently active user */
   items: WishlistItem[];
   userId: number | null;
-  loadForUser: (userId: number) => void;
+  /** Call on login to hydrate items from persisted data */
+  setUser: (userId: number) => void;
   toggleItem: (item: WishlistItem) => void;
   removeItem: (id: number) => void;
+  /** Call on logout: clears in-memory state, preserves persisted data */
   clearWishlist: () => void;
   isWishlisted: (id: number) => boolean;
 }
 
-function storageKey(userId: number) {
-  return `shoply-wishlist-${userId}`;
-}
+export const useWishlistStore = create<WishlistState>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        itemsByUser: {},
+        items: [],
+        userId: null,
 
-function saveToStorage(userId: number, items: WishlistItem[]) {
-  try {
-    localStorage.setItem(storageKey(userId), JSON.stringify(items));
-  } catch {
-    // localStorage unavailable (SSR / private browsing)
-  }
-}
+        setUser: (userId) =>
+          set((state) => ({
+            userId,
+            items: state.itemsByUser[userId] ?? [],
+          })),
 
-function loadFromStorage(userId: number): WishlistItem[] {
-  try {
-    const raw = localStorage.getItem(storageKey(userId));
-    return raw ? (JSON.parse(raw) as WishlistItem[]) : [];
-  } catch {
-    return [];
-  }
-}
+        toggleItem: (item) =>
+          set((state) => {
+            if (!state.userId) return {};
+            const exists = state.items.some((i) => i.id === item.id);
+            const next = exists
+              ? state.items.filter((i) => i.id !== item.id)
+              : [...state.items, item];
+            return {
+              items: next,
+              itemsByUser: { ...state.itemsByUser, [state.userId]: next },
+            };
+          }),
 
-export const useWishlistStore = create<WishlistState>()((set, get) => ({
-  items: [],
-  userId: null,
+        removeItem: (id) =>
+          set((state) => {
+            if (!state.userId) return {};
+            const next = state.items.filter((i) => i.id !== id);
+            return {
+              items: next,
+              itemsByUser: { ...state.itemsByUser, [state.userId]: next },
+            };
+          }),
 
-  loadForUser: (userId) => {
-    const items = loadFromStorage(userId);
-    set({ items, userId });
-  },
+        clearWishlist: () => set({ items: [], userId: null }),
 
-  toggleItem: (item) => {
-    const { items, userId } = get();
-    if (!userId) return;
-    const exists = items.some((i) => i.id === item.id);
-    const next = exists
-      ? items.filter((i) => i.id !== item.id)
-      : [...items, item];
-    set({ items: next });
-    saveToStorage(userId, next);
-  },
-
-  removeItem: (id) => {
-    const { items, userId } = get();
-    if (!userId) return;
-    const next = items.filter((i) => i.id !== id);
-    set({ items: next });
-    saveToStorage(userId, next);
-  },
-
-  clearWishlist: () => set({ items: [], userId: null }),
-
-  isWishlisted: (id) => get().items.some((i) => i.id === id),
-}));
+        isWishlisted: (id) => get().items.some((i) => i.id === id),
+      }),
+      {
+        name: "shoply-wishlist",
+        // Only persist the per-user map; in-memory fields are re-hydrated via setUser
+        partialize: (state) => ({ itemsByUser: state.itemsByUser }),
+      },
+    ),
+    { name: "WishlistStore" },
+  ),
+);

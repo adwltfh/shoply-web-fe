@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Next.js Boilerplate",
-  description: "Next.js + Tailwind CSS + React Query + Zustand + Axios",
+  title: "Shoply - Your Ultimate Marketplace Solution",
+  description: "Personal Project - Next.js + Tailwind CSS + React Query + Zustand + Axios",
 };
 
 export default function RootLayout({

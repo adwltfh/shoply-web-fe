@@ -5,13 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { useShallow } from "zustand/react/shallow";
 
 const SHIPPING_THRESHOLD = 50;
 const SHIPPING_COST = 5;
 
 export default function CartPage() {
   const router = useRouter();
-  const { cart, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const { cart, removeFromCart, updateQuantity, clearCart } = useCartStore(
+    useShallow((s) => ({
+      cart: s.cart,
+      removeFromCart: s.removeFromCart,
+      updateQuantity: s.updateQuantity,
+      clearCart: s.clearCart,
+    })),
+  );
 
   const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
