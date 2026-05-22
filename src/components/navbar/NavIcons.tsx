@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Heart, ShoppingCart, User, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useShallow } from "zustand/react/shallow";
@@ -41,6 +41,22 @@ export default function NavIcons() {
 
   const wishlistCount = wishlistItems.length;
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Re-hydrate wishlist after page reload when auth is already persisted
   useEffect(() => {
     if (user?.id && user.id !== wishlistUserId) {
@@ -51,6 +67,7 @@ export default function NavIcons() {
   const handleLogout = () => {
     logout();
     clearWishlist();
+    setIsDropdownOpen(false);
     router.push("/");
   };
 
@@ -78,8 +95,12 @@ export default function NavIcons() {
 
       {/* User */}
       {isAuthenticated && user ? (
-        <div className="flex items-center gap-2">
-          <Link href="/wishlist" title={`${user.firstName} ${user.lastName}`}>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            title={`${user.firstName} ${user.lastName}`}
+            className="flex items-center cursor-pointer"
+          >
             {user.image ? (
               <Image
                 src={user.image}
@@ -93,14 +114,18 @@ export default function NavIcons() {
                 {user.firstName[0]}
               </div>
             )}
-          </Link>
-          <button
-            onClick={handleLogout}
-            title="Sign out"
-            className="text-gray-400 hover:text-orange-500 transition-colors"
-          >
-            <LogOut size={16} />
           </button>
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-md py-1 z-50">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-colors rounded-2xl"
+              >
+                <LogOut size={14} />
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <Link href="/login">
