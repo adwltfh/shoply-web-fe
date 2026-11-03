@@ -1,20 +1,31 @@
 {
-  "name": "seller",
+  "name": "shoply-seller",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "bun test",
+    "test:unit": "bun test src",
+    "test:db": "bun test supabase",
+    "provision:owner": "bun --env-file=.env.local scripts/provision-owner.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.118.0",
     "next": "16.4.4",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.14",
     "@tailwindcss/turbopack": "^4",
+    "@types/bun": "^1.4.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

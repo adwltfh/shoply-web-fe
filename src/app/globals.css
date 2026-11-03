@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Shoply Seller tokens (spec §15): warm neutral surfaces, restrained orange for
+   actions. Dark ink on orange keeps buttons above WCAG AA contrast. */
+@theme {
+  --color-primary: #e96b32;
+  --color-primary-hover: #d95d25;
+  --color-primary-ink: #281a12;
+  --color-primary-soft: #fcebe1;
+  --color-canvas: #faf9f6;
+  --color-surface: #ffffff;
+  --color-ink: #292725;
+  --color-ink-2: #67625d;
+  --color-line: #e8e2db;
+  --color-line-strong: #d3cbc2;
+  --color-success: #20785d;
+  --color-success-soft: #e3f2ec;
+  --color-warning: #9b6b1b;
+  --color-warning-soft: #f8eedb;
+  --color-danger: #b63a3a;
+  --color-danger-soft: #f8e4e4;
+  --radius-card: 10px;
+  --radius-input: 8px;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
